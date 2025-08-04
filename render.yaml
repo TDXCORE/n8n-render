@@ -1,59 +1,31 @@
 services:
   - type: web
     name: n8n
-    env: docker
-    region: oregon # optional (defaults to oregon)
-    plan: standard # optional (defaults to starter)
-    branch: main # optional (defaults to master)
+    runtime: docker           # reemplaza 'env: docker'
+    plan: standard
+    region: oregon
+    branch: main
     numInstances: 1
-    healthCheckPath: /
+    dockerCommand: ["n8n","start"]   # asegura que arranque el proceso
+    healthCheckPath: /healthz        # endpoint oficial
     envVars:
+      - key: PORT
+        value: "5678"
+      - key: N8N_HOST
+        value: n8n-render-uefr.onrender.com
+      - key: N8N_PROTOCOL
+        value: https
+      - key: N8N_EDITOR_BASE_URL
+        value: https://n8n-render-uefr.onrender.com
+      - key: WEBHOOK_URL
+        value: https://n8n-render-uefr.onrender.com/
+      - key: N8N_ENCRYPTION_KEY      # ¡genera uno de 32+ caracteres!
+        generateValue: true
       - key: DB_TYPE
         value: postgresdb
-      - key: DB_POSTGRESDB_HOST
-        fromDatabase:
-          name: n8n-db
-          property: host
-      - key: DB_POSTGRESDB_DATABASE
-        fromDatabase:
-          name: n8n-db
-          property: database
-      - key: DB_POSTGRESDB_PORT
-        fromDatabase:
-          name: n8n-db
-          property: port
-      - key: DB_POSTGRESDB_USER
-        fromDatabase:
-          name: n8n-db
-          property: user
-      - key: DB_POSTGRESDB_PASSWORD
-        fromDatabase:
-          name: n8n-db
-          property: password
       - key: DB_POSTGRESDB_SCHEMA
         value: public
-      - key: WEBHOOK_URL
-        value: https://your-n8n-app.onrender.com/
-      - key: N8N_ENCRYPTION_KEY
-        value: YOUR_ENCRYPTION_KEY_HERE
-      - key: GENERIC_TIMEZONE
-        value: America/Sao_Paulo
-      - key: TZ
-        value: America/Sao_Paulo
-      - key: N8N_LOG_LEVEL
-        value: info
-      - key: EXECUTIONS_DATA_PRUNE
-        value: true
-      - key: EXECUTIONS_DATA_MAX_AGE
-        value: 168
-      - key: EXECUTIONS_DATA_SAVE_ON_ERROR
-        value: all
-      - key: EXECUTIONS_DATA_SAVE_ON_SUCCESS
-        value: none
-      - key: EXECUTIONS_DATA_SAVE_ON_PROGRESS
-        value: false
-      - key: EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS
-        value: false
+      # ▼ el resto de variables (timezone, pruning, etc.) se mantienen
     disk:
       name: n8n-disk
       mountPath: /home/node/.n8n
